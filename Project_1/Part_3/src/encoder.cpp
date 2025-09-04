@@ -1,24 +1,42 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include "encoder.h"
+#include "digital_in.h"
+#include "digital_out.h"
 
-Encoder::Encoder(uint8_t a_bit, uint8_t b_bit, uint8_t led_bit)
-: A(a_bit), B(b_bit), led(led_bit), lastA(false), pos(0) {}
+static volatile int32_t s_pos = 0;
+static uint8_t s_a_mask = 0;
+static uint8_t s_b_mask = 0;
+static uint8_t s_led_mask = 0;
 
-void Encoder::init() {
-    A.init();        
-    B.init();            
-    lastA = A.is_hi();
+void encoder_init(uint8_t a_bit, uint8_t b_bit, uint8_t led_bit)
+{
+    s_a_mask   = (uint8_t)(1u << a_bit);  
+    s_b_mask   = (uint8_t)(1u << b_bit);  
+    s_led_mask = (uint8_t)(1u << led_bit);
+
+    Digital_in A(a_bit);  A.init();
+    Digital_in B(b_bit);  B.init();
+    Digital_out LED(led_bit);
+    LED.init();
+
+    PCICR  |= (1 << PCIE0);     
+    PCMSK0 |= s_a_mask;          
+    PCIFR  |= (1 << PCIF0);     
+
+    sei(); 
 }
 
-void Encoder::sample_once() {
-    bool a = A.is_hi();
-    if (a != lastA) {
-        bool b = B.is_hi();
-        if (a == b) { pos--; } else { pos++; } 
-        lastA = a;
-    }
-    
+int encoder_position(void)
+{
+    return (int)s_pos;
 }
 
-int32_t Encoder::position() const {
-    return pos;
+ISR(PCINT0_vect)
+{
+    uint8_t pinb = PINB;
+    bool a = (pinb & s_a_mask) != 0;  
+    bool b = (pinb & s_b_mask) != 0;  
+
+    if (a == b) { s_pos--; } else { s_pos++; }
 }

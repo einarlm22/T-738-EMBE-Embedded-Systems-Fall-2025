@@ -1,7 +1,7 @@
 #include <util/delay.h>
 #include "encoder.h"
 
-#define SAMPLE_US 100
+#define SAMPLE_US 138
 
 Digital_out led(5);
 
