@@ -1,18 +1,30 @@
-#include <Arduino.h>
+#include <util/delay.h>
+#include <Arduino.h>     
+#include "encoder.h"
 
-// put function declarations here:
-int myFunction(int, int);
+#define SAMPLE_US 100     
+#define PRINT_MS  10   
 
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
-}
+Digital_out led(5);
 
-void loop() {
-  // put your main code here, to run repeatedly:
-}
+int main() {
+  init();                 
+  Serial.begin(9600);    
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  Encoder enc(0, 1, 5);
+  enc.init();
+
+  unsigned long last_print = 0;
+
+  while (1) {
+    enc.sample_once();           
+    _delay_us(SAMPLE_US);
+    unsigned long now = millis();
+    if (now - last_print >= PRINT_MS) {
+      last_print = now;
+      Serial.println(enc.position());  
+    }
+    led.set_hi();
+    led.set_lo(); 
+  }
 }
