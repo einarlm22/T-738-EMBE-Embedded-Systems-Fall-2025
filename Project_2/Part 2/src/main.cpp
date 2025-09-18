@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "encoder.h"
 #include "digital_out.h"
-#include "motorpwm.h"
 
-#define PRINT_MS 30    
+#define PRINT_MS 100     
+
 #define CPR 1400            
-#define RPM_WIN_MS 30
+#define RPM_WIN_MS 100
+
+Digital_out led(5);
 
 long last_pos = 0;
 unsigned long last_rpm_ms = 0;
@@ -16,14 +18,8 @@ int main() {
   Serial.begin(9600);
 
   encoder_init(0, 1, 5);
-  motor_pwm_init();
-
-
-  motor_pwm_setA(255);  // D10 at 100%
-  motor_pwm_setB(0);    // D11 at 0%
 
   unsigned long last = 0;
-
   while (1) {
     unsigned long now = millis();
 
@@ -33,7 +29,8 @@ int main() {
       last_pos = pos;
       last_rpm_ms += RPM_WIN_MS;                  
 
-      if (CPR > 0) rpm_val = (delta * 2000L) / CPR;
+      // RPM = delta * 600 / CPR  (delta is for 0.1 s)
+      if (CPR > 0) rpm_val = (delta * 600L) / CPR;
       else         rpm_val = 0;
     }
 
