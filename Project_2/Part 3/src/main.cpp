@@ -6,12 +6,12 @@
 #define CPR         1400
 #define RPM_WIN_MS  4       // ~250 Hz
 #define PRINT_MS    50
-#define KP          1.0
-#define REF_RPM     50
+#define KP          20
+#define REF_RPM     80
 #define STEP_DELAY  200
 
 long last_pos = 0;
-unsigned long last_rpm_ms = 0;
+unsigned long last_rpm_ms = 0; 
 long rpm_val = 0;
 
 int main() {
