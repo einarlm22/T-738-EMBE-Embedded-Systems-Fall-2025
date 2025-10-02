@@ -1,0 +1,12 @@
+@startuml part1
+
+
+[*] --> Initialization
+
+state "Initialization\nentry / initParameters\nexit / ready\ndo / run_init_tasks" as Initialization
+state "Operational\nentry / ledOn\nexit / stopNormalIO\ndo / runIO" as Operational
+
+Initialization --> Operational 
+Operational --> Initialization : reset
+
+@enduml
