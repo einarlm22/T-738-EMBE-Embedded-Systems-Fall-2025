@@ -8,7 +8,7 @@
 #define CPR         1400
 #define SAMPLE_MS   4
 #define PRINT_MS    50
-#define REF_RPM     80
+#define REF_RPM     60
 #define KP_GAIN     6.0
 #define PWM_HZ      20000
 
